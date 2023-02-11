@@ -1,0 +1,16 @@
+name: SystemShop
+version: '${project.version}'
+main: org.xjcraft.shop.SystemShop
+api-version: 1.19
+depend: [ SimpleSpigot ,MultiCurrency ]
+authors: [ Ree ]
+commands:
+  cmd:
+    description: Contains all commands in [SystemShop].
+    usage: 输入 /<command> help 查看命令帮助
+    permission: shop.command
+    permission-message: 你没有 <permission> 权限
+permissions:
+  shop.command:
+    description: 允许玩家用 <command> 命令
+    default: true
