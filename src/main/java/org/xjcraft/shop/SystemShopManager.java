@@ -16,7 +16,6 @@ import org.xjcraft.utils.ScriptUtil;
 import org.xjcraft.utils.StringUtil;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +67,7 @@ public class SystemShopManager implements CommandExecutor, TabCompleter {
                 }
                 placeholder.put(arg, value);
             }
-            String parse = ScriptUtil.parse(placeholder, trade.getAmount());
+            String parse = ScriptUtil.parse(trade.getAmount(), placeholder);
             if (parse == null) {
                 player.sendMessage("计算错误！请联系OP进行修复！");
                 return false;
@@ -78,7 +77,7 @@ public class SystemShopManager implements CommandExecutor, TabCompleter {
             placeholder.put("y", String.format("%.1f", player.getLocation().getY()));
             placeholder.put("z", String.format("%.1f", player.getLocation().getZ()));
             placeholder.put("world", player.getLocation().getWorld().getName());
-            String cmd = StringUtil.applyPlaceHolder(placeholder, trade.getCmd());
+            String cmd = StringUtil.applyPlaceHolder(trade.getCmd(), placeholder);
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 OperateResult info = CurrencyService.getCurrencyInfo(trade.getCurrency());
                 if (!info.getSuccess()) {
@@ -87,13 +86,13 @@ public class SystemShopManager implements CommandExecutor, TabCompleter {
                 }
                 CurrencyInfoEntity data = (CurrencyInfoEntity) info.getData();
                 String owner = data.getOwner();
-                if(cost.compareTo(BigDecimal.ZERO)<=0){
+                if (cost.compareTo(BigDecimal.ZERO) <= 0) {
                     player.sendMessage("错误的数值！");
                     return;
                 }
                 OperateResult result = BankService.transferTo(player.getName(), owner, trade.getCurrency(), cost, TxTypeEnum.ELECTRONIC_TRANSFER_OUT, "指令商店" + trade.getId() + ":" + cost.toString());
                 if (result.getSuccess()) {
-                    player.sendMessage(String.format("消费成功！扣除了%.2f的%s,%s", cost, data.getName(),trade.getDesc()));
+                    player.sendMessage(String.format("消费成功！扣除了%.2f的%s,%s", cost, data.getName(), trade.getDesc()));
                     plugin.getLogger().info(String.format("%s spend %.2f %s to dispatch:%s", player.getName(), cost, trade.getCurrency(), cmd));
                     plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmd));
                 }
@@ -124,7 +123,7 @@ public class SystemShopManager implements CommandExecutor, TabCompleter {
             }
             int index = strings.length - 1;
             if (index <= trade.getArgs().size()) {
-                List<String> remain = trade.getArgs().subList(index-1, trade.getArgs().size());
+                List<String> remain = trade.getArgs().subList(index - 1, trade.getArgs().size());
 //                String[] remain = Arrays.copyOfRange(trade.getArgs(), index, trade.getArgs().size());
                 return Collections.singletonList(StringUtil.join(remain.toArray(), ""));
             }
